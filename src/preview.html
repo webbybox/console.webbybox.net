@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Preview</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="previewFrame"></iframe>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const previewId = params.get("id");
+
+        if (!previewId) {
+            document.body.innerHTML = "<p>Missing preview ID</p>";
+        }
+        else {
+            fetch(`/preview/render?id=${previewId}`)
+                .then(res => res.text())
+                .then(html => {
+                    const base = `<base href="/preview/src/${previewId}/" />`;
+                    const finalHtml = html.replace("<head>", `<head>${base}`);
+
+                    const iframe = document.getElementById("previewFrame");
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(finalHtml);
+                    doc.close();
+                });
+            }
+
+        
+    </script>
+</body>
+</html>

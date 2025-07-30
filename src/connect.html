@@ -1,0 +1,20 @@
+<wby-layout src="_console_layout.html" />
+<wby-set name="page_title" value="Connect" />
+
+<wby-request action="/connect/getSSIDs" method="GET" as="networks"/>
+
+<wby-section name="body">
+    <h2>Connect your WebbyBox to Wi-Fi</h2>
+	<wby-form action="/connect" method="POST">
+		<label>SSID:</label>
+		<select name="ssid">
+            <wby-foreach name="networks" as="network">
+                <option value="{{network}}">{{network}}</option>
+            </wby-foreach>
+		</select>
+		<br /><br />
+		<label>Password:</label>
+        <input type="password" name="password"><br><br>
+		<input type="submit" value="Connect">
+	</form>
+</wby-section>

@@ -1,0 +1,8 @@
+{
+    "console-api": {
+        "url": "http://localhost:8083/api/v1/",
+        "headers": {
+            "BearerToken" : "api-key-here"
+        }
+    }
+}

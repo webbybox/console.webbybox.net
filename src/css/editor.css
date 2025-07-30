@@ -1,0 +1,30 @@
+#sidebar {
+    min-width: 250px;
+    background-color: #f3f3f3;
+    overflow-y: auto;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+#editor { flex-grow: 1; height: 100%; }
+#container {
+    display: flex;
+    height: 80vh;
+}
+#controls {
+    padding: 8px;
+    background-color: #eaeaea;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: flex-end;
+}
+.file, .folder { cursor: pointer; margin-left: 10px; }
+
+#toolbar {
+    background-color: #f8f8f8;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.unsaved-indicator {
+    margin-left: 4px;
+}

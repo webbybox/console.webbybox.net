@@ -1,0 +1,17 @@
+{
+    "siteConfig":{
+        "logging": {
+            "level": "trace",
+            "filepath": "./logs/home.webbybox.net.log",
+            "maxSizeMB": 10,
+            "maxBackups": 7,
+            "maxAgeDays": 14,
+            "compress": false
+        },
+        "src": "C:/Users/Josh/Documents/webbybox/home.webbybox.net/src",
+        "port": 8080,
+        "privacy": "public",
+        "jsChallenge": true,
+        "ddns": true
+    }
+}

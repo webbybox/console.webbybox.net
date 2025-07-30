@@ -1,0 +1,11 @@
+<wby-layout src="_console_layout.html" />
+<wby-set name="page_title" value="Port Forwarding" />
+
+<wby-request action="https://www.google.com/" method="GET" as="html" />
+
+<wby-section name="body">
+    test
+    <wby-html>
+        {{html}}
+    </wby-html>
+</wby-section>

@@ -1,0 +1,73 @@
+<wby-request 
+    action="wby-console/getServices"
+    method="GET"
+    as="services"/>
+
+<wby-layout src="_console_layout.html" />
+<wby-set name="page_title" value="Services" />
+
+<wby-section name="body">
+    <h1>Service Manager</h1>
+    
+    <div class="services-table">
+        <!-- Header -->
+        <div class="services-row services-header">
+            <div class="services-cell">Service</div>
+            <div class="services-cell">Status</div>
+            <div class="services-cell">Actions</div>
+        </div>
+
+        <!-- Rows -->
+        <wby-foreach name="services" as="service">
+            <div class="services-row">
+                <div class="services-cell">{{service.name}}</div>
+                <div class="services-cell">{{service.status}}</div>
+                <div class="services-cell">
+                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'start' }">
+                        <button type="submit">Start</button>
+                    </wby-form>
+                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'stop' }">
+                        <button type="submit">Stop</button>
+                    </wby-form>
+                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'restart' }">
+                        <button type="submit">Restart</button>
+                    </wby-form>
+                </div>
+            </div>
+        </wby-foreach>
+    </div>
+</wby-section>
+
+<wby-section name="styles">
+    <style>
+        .services-table {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        .services-row {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            padding: 8px 0;
+        }
+
+        .services-header {
+            font-weight: bold;
+            background-color: #f4f4f4;
+        }
+
+        .services-cell {
+            flex: 1;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .services-cell button {
+            margin-right: 5px;
+        }
+    </style>
+    
+</wby-section>

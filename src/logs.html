@@ -1,0 +1,39 @@
+<wby-layout src="/_console_layout.html" />
+<wby-set name="page_title" value="Logs" />
+
+<wby-section name="log_levels">
+    <label>Minimum Log Level</label>
+    <select>
+        <option value="Trace">Trace</option>
+        <option value="Debug">Debug</option>
+        <option value="Info">Info</option>
+        <option value="Warn">Warn</option>
+        <option value="Error">Error</option>
+        <option value="Fatal">Fatal</option>
+    </select>
+</wby-section>
+
+<wby-section name="log_table">
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Level</th>
+            <th>Message</th>
+        </tr>
+        <tr>
+            <!-- Log Table Body here -->
+        </tr>
+    </table>
+</wby-section>
+
+<wby-section name="body">
+    <div>
+        <h4>WebbyBox - Main</h4>
+        <wby-render name="log_levels" />
+        <wby-render name="log_table" />
+
+        <h4>WebbyBox - Console</h4>
+        <wby-render name="log_levels" />
+        <wby-render name="log_table" />
+    </div>
+</wby-section>

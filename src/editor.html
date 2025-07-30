@@ -1,0 +1,53 @@
+<wby-layout src="_console_layout.html" />
+<wby-set name="page_title" value="Editor" />
+
+<wby-request action="/editor/getEnvironments" method="GET" as="environments" type="object" />
+
+<wby-section name="header">
+    <h2>Webby Code Editor</h2>
+</wby-section>
+
+<wby-section name="body">
+    <div id="toolbar">
+        <button id="viewBtn">View</button>
+        <button id="saveBtn">Save</button>
+        <button id="syncBtn">Push to Production</button>
+    </div>
+    <div id="container">
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <div>Webby File Explorer</div>
+                <button id="newFileBtn">New File</button>
+                <button id="newFolderBtn">New Folder</button>
+
+                <select id="environmentSelect">
+                    <wby-repeat count="{{len(environments)}}" as="i">
+                        <option value="{{environments[i].configPath}}">{{environments[i].name}}</option>
+                    </wby-repeat>
+                </select>
+                
+            </div>
+            <div id="fileTree"></div>
+        </div>
+        <div id="editor"></div>
+    </div>
+</wby-section>
+
+<wby-section name="styles">
+    <!-- jsTree -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/themes/default/style.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/editor.css" />
+</wby-section>
+
+<wby-section name="scripts">
+    <!-- JQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- jsTree-->
+    <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/jstree.min.js"></script>
+    <!-- Monaco -->
+    <script src="https://unpkg.com/monaco-editor@0.43.0/min/vs/loader.js"></script>
+
+    <script src="/js/editor.js"></script>
+</wby-section>
