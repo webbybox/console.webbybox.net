@@ -1,7 +1,8 @@
 <wby-request 
     action="wby-console/getServices"
+    api="console" 
     method="GET"
-    as="services"/>
+    as="_services"/>
 
 <wby-layout src="_console_layout.html" />
 <wby-set name="page_title" value="Services" />
@@ -18,18 +19,18 @@
         </div>
 
         <!-- Rows -->
-        <wby-foreach name="services" as="service">
+        <wby-foreach name="_services" as="_service">
             <div class="services-row">
-                <div class="services-cell">{{service.name}}</div>
-                <div class="services-cell">{{service.status}}</div>
+                <div class="services-cell">{{_service.name}}</div>
+                <div class="services-cell">{{_service.status}}</div>
                 <div class="services-cell">
-                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'start' }">
+                    <wby-form action="wby-console/services/" api="console" method="POST" body="{ name: '{{_service.name}}', action: 'start' }">
                         <button type="submit">Start</button>
                     </wby-form>
-                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'stop' }">
+                    <wby-form action="wby-console/services/" api="console" method="POST" body="{ name: '{{_service.name}}', action: 'stop' }">
                         <button type="submit">Stop</button>
                     </wby-form>
-                    <wby-form action="wby-console/services/" method="POST" body="{ name: '{{service.name}}', action: 'restart' }">
+                    <wby-form action="wby-console/services/" api="console" method="POST" body="{ name: '{{_service.name}}', action: 'restart' }">
                         <button type="submit">Restart</button>
                     </wby-form>
                 </div>

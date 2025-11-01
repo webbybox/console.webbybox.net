@@ -1,7 +1,7 @@
 <wby-layout src="_console_layout.html" />
 <wby-set name="page_title" value="Connect" />
 
-<wby-request action="/connect/getSSIDs" method="GET" as="networks"/>
+<wby-request action="/connect/getSSIDs" api="console" method="GET" as="networks"/>
 
 <wby-section name="body">
     <h2>Connect your WebbyBox to Wi-Fi</h2>

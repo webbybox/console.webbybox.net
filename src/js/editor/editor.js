@@ -1,9 +1,11 @@
+import { EditorApi } from './editor_api.js';
+
+const editorApi = new EditorApi();
 let editor;
-let models = {}; // unsaved changes
+let models = {};
 let selectedFilePath;
 let environmentPath;
 let srcPath;
-
 let modelKey;
 
 require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.43.0/min/vs' } });
@@ -25,28 +27,20 @@ require(['vs/editor/editor.main'], function () {
 function parseFileTree() {
     $('#fileTree').jstree({
         core: {
-            data: {
-                url: '/editor/getNodeTree',
-                dataType: 'json',
-                data: function (node) {
-                    environmentPath = $('#environmentSelect').val();
-                    return {
-                        id: node.id,
-                        environmentPath: environmentPath
-                    };
+            data: async function (node, cb) {
+                environmentPath = $('#environmentSelect').val();
+                try {
+                    const data = await editorApi.getNodeTree(node.id, environmentPath);
+                    cb(data);
+                } catch (err) {
+                    console.error(err);
+                    cb([]);
                 }
             },
-            check_callback: true,
+            check_callback: true
         },
         plugins: ['contextmenu', 'dnd', 'wholerow', 'types'],
-        types: {
-            folder: {
-                icon: 'jstree-folder'
-            },
-            file: {
-                icon: 'jstree-file'
-            }
-        },
+        types: { folder: { icon: 'jstree-folder' }, file: { icon: 'jstree-file' } },
         contextmenu: {
             items: function(node) {
                 const tree = $('#fileTree').jstree(true);
@@ -84,135 +78,70 @@ function parseFileTree() {
         },
     });
 
-
-    $('#fileTree').on('select_node.jstree', function (e, data) {
+    $('#fileTree').on('select_node.jstree', async (e, data) => {
         const filePath = data.node.original?.path;
         if (data.node.original?.type === 'folder') return;
-
-        // Store selected path globally
         selectedFilePath = filePath;
-
         modelKey = `${environmentPath}_${selectedFilePath}`;
 
         if (models[modelKey]) {
-            // Reuse the model if already exists
             editor.setModel(models[modelKey]);
         } else {
-            // Load content for new file
-            $.get(`/editor/getNodeText?path=${encodeURIComponent(selectedFilePath)}`, function (content) {
-                const language = getLanguageFromFilePath(selectedFilePath);
-                const model = monaco.editor.createModel(content, language);
-                models[modelKey] = model;
-                editor.setModel(model);
+            const content = await editorApi.getNodeText(selectedFilePath);
+            const language = getLanguageFromFilePath(selectedFilePath);
+            const model = monaco.editor.createModel(content, language);
+            models[modelKey] = model;
+            editor.setModel(model);
 
-                // Attach change listener for current model
-                if (!model._changeTracked) { // Prevent multiple listeners
-                    model.onDidChangeContent(() => {
-                        markEdited(selectedFilePath);
-                    });
-                    model._changeTracked = true;
-                }
-            });
+            if (!model._changeTracked) {
+                model.onDidChangeContent(() => markEdited(selectedFilePath));
+                model._changeTracked = true;
+            }
         }
     });
 
-    $('#fileTree').on('move_node.jstree', function (e, data) {
-        const from = data.node.original.path;
-        const newParent = data.parent === '#' ? '' : data.instance.get_node(data.parent).original.path;
-        const fileName = data.node.text;
-        const to = `${newParent}/${fileName}`.replace(/^\/+/, '');
-
-        fetch('/editor/moveNode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ oldPath: from, targetPath: to })
-        }).then(res => {
-            if (!res.ok) {
-                alert('Failed to move file.');
-                location.reload(); // fallback
-            } else {
-                // Optionally refresh or store new path in node.original.path
-                data.node.original.path = to;
-            }
-        });
+    $('#fileTree').on('move_node.jstree', async (e, data) => {
+        try {
+            await editorApi.moveNode(data.node.original.path, buildNewPath(data));
+            data.node.original.path = buildNewPath(data);
+        } catch {
+            alert('Failed to move file.');
+            location.reload();
+        }
     });
 
-    $('#fileTree').on('rename_node.jstree', function (e, data) {
-        console.log("Rename triggered:", data);
+    $('#fileTree').on('rename_node.jstree', async (e, data) => {
         const oldPath = data.node.original.path;
-        const newName = data.text;
-
-        const tree = data.instance; // get the jsTree instance
-        const parentNode = tree.get_node(data.node.parent);
-        const parentPath = parentNode.original?.path || '';
-        const newPath = parentPath ? `${parentPath}/${newName}` : newName;
-
-        // Update internal path
-        data.node.original.path = newPath;
-
-        // Call backend to rename the file/folder
-        fetch('/editor/renameNode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                oldPath: oldPath,
-                targetPath: newPath
-            })
-        }).then(res => {
-            if (!res.ok) {
-                alert('Rename failed.');
-                tree.refresh(); // revert the rename in the UI
-            } else {
-                selectedFilePath = newPath;
-                console.log('Rename successful!');
-            }
-        });
+        const newPath = buildNewPath(data);
+        try {
+            await editorApi.renameNode(oldPath, newPath);
+            data.node.original.path = newPath;
+        } catch {
+            alert('Rename failed.');
+            data.instance.refresh();
+        }
     });
 
-    $('#fileTree').on('create_node.jstree', function (e, data) {
-        const tree = data.instance;
-        const parentNode = tree.get_node(data.parent);
-        const parentPath = parentNode.original?.path || '';
-        const newName = data.node.text;
-        const newPath = parentPath ? `${parentPath}/${newName}` : newName;
-
-        // Store path for future reference
-        data.node.original = { path: newPath };
-
-        fetch('/editor/createNode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                path: newPath,
-                isFolder: data.node.icon === 'jstree-folder'
-            })
-        }).then(res => {
-            if (!res.ok) {
-                alert("Creation failed");
-                tree.refresh();
-            } else {
-                console.log("Node created:", newPath);
-            }
-        });
+    $('#fileTree').on('create_node.jstree', async (e, data) => {
+        const newPath = buildNewPath(data);
+        try {
+            await editorApi.createNode(newPath, data.node.icon === 'jstree-folder');
+            data.node.original = { path: newPath };
+        } catch {
+            alert('Creation failed');
+            data.instance.refresh();
+        }
     });
 
-    $('#fileTree').on('delete_node.jstree', function (e, data) {
+    $('#fileTree').on('delete_node.jstree', async (e, data) => {
         const nodePath = data.node.original?.path;
-        if (!nodePath) return;
-
-        fetch('/editor/deleteNode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: nodePath })
-        }).then(res => {
-            if (!res.ok) {
-                alert("Deletion failed");
-                $('#fileTree').jstree(true).refresh(); // restore deleted node
-            } else {
-                console.log("Node deleted:", nodePath);
-                delete models[nodePath]
-            }
-        });
+        try {
+            await editorApi.deleteNode(nodePath);
+            delete models[nodePath];
+        } catch {
+            alert('Deletion failed');
+            $('#fileTree').jstree(true).refresh();
+        }
     });
 
     $('#fileTree').on('dragover', function (e) {
@@ -220,41 +149,17 @@ function parseFileTree() {
         e.originalEvent.dataTransfer.dropEffect = 'copy';
     });
 
-    $('#fileTree').on('drop', function (e) {
+    $('#fileTree').on('drop', async (e) => {
         e.preventDefault();
-        e.stopPropagation();
-
-        // Get the node that was dropped ON
         const nodeElm = e.target.closest('li.jstree-node');
         if (!nodeElm) return;
-
-        const files = e.originalEvent.dataTransfer.files;
-        if (files.length === 0) return;
-
-        // Upload each file
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('targetPath', nodeElm.id + '/' + file.name);
-
-            fetch('/editor/uploadNode', {
-                method: 'POST',
-                body: formData
-            })
-            .then(result => {
-                console.log(`Uploaded ${file.name}:`, result);
-                $('#fileTree').jstree(true).refresh(); // Refresh the tree to show the new file
-            })
-            .catch(error => {
-                console.error(error);
-                alert(`Error uploading ${file.name}`);
-            });
+        for (const file of e.originalEvent.dataTransfer.files) {
+            await editorApi.uploadNode(file, `${nodeElm.id}/${file.name}`);
+            $('#fileTree').jstree(true).refresh();
         }
     });
 
-    $('#environmentSelect').on('change', function () {
-        $('#fileTree').jstree(true).refresh();
-    });
+    $('#environmentSelect').on('change', () => $('#fileTree').jstree(true).refresh());
 }
 
 function markEdited(path) {

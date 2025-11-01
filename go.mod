@@ -1,3 +1,3 @@
-module github.com/webbybox/home.webbybox.net
+module github.com/webbybox/console.webbybox.net
 
 go 1.24.2

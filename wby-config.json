@@ -1,17 +1,25 @@
 {
-    "siteConfig":{
+    "site":{
         "logging": {
             "level": "trace",
-            "filepath": "./logs/home.webbybox.net.log",
+            "filepath": "./logs/console.webbybox.net.log",
             "maxSizeMB": 10,
             "maxBackups": 7,
             "maxAgeDays": 14,
             "compress": false
         },
-        "src": "C:/Users/Josh/Documents/webbybox/home.webbybox.net/src",
+        "src": "C:/Users/Josh/Documents/webbybox/sites/console.webbybox.net/src",
         "port": 8080,
         "privacy": "public",
         "jsChallenge": true,
         "ddns": true
+    },
+    "endpoints": {
+        "console": {
+            "url": "http://localhost:8081/api/v1/",
+            "headers": {
+                "BearerToken" : "api-key-here"
+            }
+        }
     }
 }

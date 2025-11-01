@@ -1,19 +1,19 @@
 <wby-layout src="_console_layout.html" />
 <wby-set name="page_title" value="Settings" />
 
-<wby-request action="/settings/getConsoleConfig" method="GET" as="response" />
+<wby-request action="/settings/getConsoleConfig" api="console" method="GET" as="_response" />
 
 <wby-section name="body">
   <h1>Console Settings</h1>
 
-  <wby-form action="/settings/updateConsoleConfig" method="POST" type="json">
+  <wby-form action="/settings/updateConsoleConfig" api="console" method="POST" type="json">
     <!-- Logging -->
     <div class="form-section">
       <h2 class="form-header">Logging</h2>
 
       <div class="form-group">
         <label class="form-label">Log Level</label>
-        <select wby-for="response.consoleConfig.siteConfig.logging.level" class="form-control form-select" >
+        <select wby-for="_response.consoleConfig.siteConfig.logging.level" class="form-control form-select" >
             <option value="trace">Trace</option>
             <option value="debug">Debug</option>
             <option value="info">Info</option>
@@ -25,27 +25,27 @@
 
       <div class="form-group">
         <label class="form-label">Log File Path</label>
-        <input class="form-control" wby-for="response.consoleConfig.siteConfig.logging.filepath" />
+        <input class="form-control" wby-for="_response.consoleConfig.siteConfig.logging.filepath" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Max Size (MB)</label>
-        <input class="form-control" wby-for="response.consoleConfig.siteConfig.logging.maxSizeMB" />
+        <input class="form-control" wby-for="_response.consoleConfig.siteConfig.logging.maxSizeMB" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Max Backups</label>
-        <input class="form-control" wby-for="response.consoleConfig.siteConfig.logging.maxBackups" />
+        <input class="form-control" wby-for="_response.consoleConfig.siteConfig.logging.maxBackups" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Max Age (Days)</label>
-        <input class="form-control" wby-for="response.consoleConfig.siteConfig.logging.maxAgeDays" />
+        <input class="form-control" wby-for="_response.consoleConfig.siteConfig.logging.maxAgeDays" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Compress</label>
-        <input wby-for="response.consoleConfig.siteConfig.logging.compress" class="form-check-input" type="checkbox" />
+        <input wby-for="_response.consoleConfig.siteConfig.logging.compress" class="form-check-input" type="checkbox" />
       </div>
     </div>
 
@@ -55,7 +55,7 @@
 
       <div class="form-group">
         <label class="form-label">Service Permission</label>
-        <select wby-for="response.consoleConfig.handlerPermissions.service" class="form-control form-select">
+        <select wby-for="_response.consoleConfig.handlerPermissions.service" class="form-control form-select">
             <option value="local">Local</option>
             <option value="online">Online</option>
         </select>
@@ -63,7 +63,7 @@
 
       <div class="form-group">
         <label class="form-label">Editor Permission</label>
-        <select wby-for="response.consoleConfig.handlerPermissions.editor" class="form-control form-select" >
+        <select wby-for="_response.consoleConfig.handlerPermissions.editor" class="form-control form-select" >
             <option value="local">Local</option>
             <option value="online">Online</option>
         </select>
@@ -71,7 +71,7 @@
 
       <div class="form-group">
         <label class="form-label">Settings Permission</label>
-        <select wby-for="response.consoleConfig.handlerPermissions.settings" class="form-control form-select" >
+        <select wby-for="_response.consoleConfig.handlerPermissions.settings" class="form-control form-select" >
             <option value="local">Local</option>
             <option value="online">Online</option>
         </select>
@@ -79,7 +79,7 @@
 
       <div class="form-group">
         <label class="form-label">Connect Permission</label>
-        <select wby-for="response.consoleConfig.handlerPermissions.connect" class="form-control form-select" >
+        <select wby-for="_response.consoleConfig.handlerPermissions.connect" class="form-control form-select" >
             <option value="local">Local</option>
             <option value="online">Online</option>
         </select>
@@ -92,39 +92,39 @@
 
       <div class="form-group">
         <label class="form-label">Port</label>
-        <input wby-for="response.consoleConfig.siteConfig.port" type="text" class="form-control" />
+        <input wby-for="_response.consoleConfig.siteConfig.port" type="text" class="form-control" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Source Path</label>
-        <input wby-for="response.consoleConfig.src" type="text" class="form-control" />
+        <input wby-for="_response.consoleConfig.src" type="text" class="form-control" />
       </div>
 
       <div class="form-group">
         <label class="form-label">JavaScript Challenge</label>
-        <input wby-for="response.consoleConfig.siteConfig.jsChallenge" type="checkbox" class="form-check-input" />
+        <input wby-for="_response.consoleConfig.siteConfig.jsChallenge" type="checkbox" class="form-check-input" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Enable DDNS</label>
-        <input wby-for="response.consoleConfig.ddns" type="checkbox" class="form-check-input" />
+        <input wby-for="_response.consoleConfig.ddns" type="checkbox" class="form-check-input" />
       </div>
     </div>
 
     <!-- Environments -->
     <div class="form-section">
       <h2 class="form-header">Environments</h2>
-      <wby-repeat count="{{len(response.consoleConfig.environments)}}" as="i">
+      <wby-repeat count="{{len(_response.consoleConfig.environments)}}" as="i">
         <div class="env-block">
-          <h3>{{response.consoleConfig.environments[i].name}}</h3>
-          <p><strong>Config Path:</strong> {{response.consoleConfig.environments[i].configPath}}</p>
+          <h3>{{_response.consoleConfig.environments[i].name}}</h3>
+          <p><strong>Config Path:</strong> {{_response.consoleConfig.environments[i].configPath}}</p>
 
           <!-- Show the environment's SiteConfig -->
           <div class="nested-section">
             <h4>Logging</h4>
             <div class="form-group">
               <label class="form-label">Log Level</label>
-              <select wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.level" class="form-control form-select">
+              <select wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.level" class="form-control form-select">
                 <option value="trace">Trace</option>
                 <option value="debug">Debug</option>
                 <option value="info">Info</option>
@@ -136,38 +136,38 @@
 
             <div class="form-group">
               <label class="form-label">Log File Path</label>
-              <input class="form-control" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.filepath" />
+              <input class="form-control" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.filepath" />
             </div>
 
             <div class="form-group">
               <label class="form-label">Max Size (MB)</label>
-              <input class="form-control" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.maxSizeMB" />
+              <input class="form-control" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.maxSizeMB" />
             </div>
 
             <div class="form-group">
               <label class="form-label">Max Backups</label>
-              <input class="form-control" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.maxBackups" />
+              <input class="form-control" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.maxBackups" />
             </div>
 
             <div class="form-group">
               <label class="form-label">Max Age (Days)</label>
-              <input class="form-control" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.maxAgeDays" />
+              <input class="form-control" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.maxAgeDays" />
             </div>
 
             <div class="form-group">
               <label class="form-label">Compress</label>
-              <input wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.logging.compress" class="form-check-input" type="checkbox" />
+              <input wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.logging.compress" class="form-check-input" type="checkbox" />
             </div>
 
             <h4>Other Settings</h4>
             <div class="form-group">
               <label class="form-label">Port</label>
-              <input class="form-control" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.port" />
+              <input class="form-control" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.port" />
             </div>
 
             <div class="form-group">
               <label class="form-label">JS Challenge</label>
-              <input class="form-check-input" type="checkbox" wby-for="response.envSiteConfigs.{{response.consoleConfig.environments[i].name}}.jsChallenge" />
+              <input class="form-check-input" type="checkbox" wby-for="_response.envSiteConfigs.{{_response.consoleConfig.environments[i].name}}.jsChallenge" />
             </div>
           </div>
         </div>

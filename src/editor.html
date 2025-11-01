@@ -1,7 +1,7 @@
 <wby-layout src="_console_layout.html" />
 <wby-set name="page_title" value="Editor" />
 
-<wby-request action="/editor/getEnvironments" method="GET" as="environments" type="object" />
+<wby-request action="/editor/getEnvironments" api="console" method="GET" as="_environments" type="object" />
 
 <wby-section name="header">
     <h2>Webby Code Editor</h2>
@@ -21,8 +21,8 @@
                 <button id="newFolderBtn">New Folder</button>
 
                 <select id="environmentSelect">
-                    <wby-repeat count="{{len(environments)}}" as="i">
-                        <option value="{{environments[i].configPath}}">{{environments[i].name}}</option>
+                    <wby-repeat count="{{len(_environments)}}" as="i">
+                        <option value="{{_environments[i].configPath}}">{{_environments[i].name}}</option>
                     </wby-repeat>
                 </select>
                 
@@ -49,5 +49,5 @@
     <!-- Monaco -->
     <script src="https://unpkg.com/monaco-editor@0.43.0/min/vs/loader.js"></script>
 
-    <script src="/js/editor.js"></script>
+    <script src="/js/editor/editor.js" type="module"></script>
 </wby-section>
